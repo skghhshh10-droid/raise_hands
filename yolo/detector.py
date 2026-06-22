@@ -10,6 +10,14 @@ def load_model():
 
 model = load_model()
 
+if "raise_start" not in st.session_state:
+    st.session_state.raise_start = {}
+
+if "confirmed_ids" not in st.session_state:
+    st.session_state.confirmed_ids = set()
+
+if "attendance" not in st.session_state:
+    st.session_state.attendance = {}
 
 # 왼쪽 손들기
 def left_hand_raised(person):
