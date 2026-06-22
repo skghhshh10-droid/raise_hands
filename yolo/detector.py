@@ -12,7 +12,7 @@ import numpy as np
 st.set_page_config(layout="wide", page_title="AI 스마트 강의실", page_icon="🏫")
 
 # ==================================================
-# 😎 세련된 디자인을 위한 Custom CSS 주입
+# 디자인을 위한 Custom CSS 주입
 # ==================================================
 st.markdown("""
     <style>
@@ -43,12 +43,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==================================================
-# ⚙️ 시스템 설정 변수 (시간 기준 변경 가능)
+# 시스템 설정 변수 (시간 기준 변경 가능)
 # ==================================================
 REQUIRED_DURATION = 3.0  # 출석 인정 시간 기준 (3초)
 
 # ==================================================
-# [팀원 2 핵심] 정밀 손들기 판정 및 예외처리 함수
+# [핵심] 정밀 손들기 판정 및 예외처리 함수
 # ==================================================
 def is_valid_hand_raise(person, is_left=True):
     """
@@ -187,7 +187,7 @@ if st.session_state.run_webcam:
 
                     duration = time.time() - st.session_state.raise_start[track_id]
                     
-                    # 💡 시각화 강화: 눈에 보이는 경로를 만들기 위해 실시간 시간 흐름을 화면에 텍스트 출력
+                    # 시각화 강화: 눈에 보이는 경로를 만들기 위해 실시간 시간 흐름을 화면에 텍스트 출력
                     cv2.putText(annotated_frame, f"STATUS: {status} ({duration:.1f}s / {REQUIRED_DURATION}s)", 
                                 (x - 40, y - 35), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 165, 255), 2)
 
