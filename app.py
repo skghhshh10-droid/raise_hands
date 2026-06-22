@@ -3,17 +3,27 @@ from database.attendance import save_attendance
 from dashboard.statistics import attendance_count
 from ui.main_page import show_dashboard
 
+import cv2
+
 
 def main():
 
-    frame = None
+    cap = cv2.VideoCapture(0)
 
-    if detect_hand_raise(frame):
-        save_attendance("학생1")
+    ret, frame = cap.read()
+
+    if ret:
+
+        detected, result_frame = detect_hand_raise(frame)
+
+        if detected:
+            save_attendance("학생1")
 
     count = attendance_count()
 
     show_dashboard(count)
+
+    cap.release()
 
 
 if __name__ == "__main__":
