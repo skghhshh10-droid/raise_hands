@@ -5,6 +5,8 @@
 
 import streamlit as st
 import pandas as pd
+import cv2
+import numpy as np
 
 from database.attendance import (
     save_attendance,
@@ -16,7 +18,6 @@ from dashboard.statistics import (
     attendance_rate
 )
 
-# 나중에 YOLO 연결
 from yolo.detector import detect_hand_raise
 
 
@@ -56,7 +57,7 @@ try:
     else:
         students = pd.DataFrame()
 
-except Exception as e:
+except Exception:
 
     students = pd.DataFrame()
 
@@ -115,19 +116,6 @@ with st.sidebar:
 
     st.divider()
 
-    if st.button(
-        "📷 웹캠 시작",
-        use_container_width=True
-    ):
-        st.success("웹캠 시작")
-
-    if st.button(
-        "⛔ 웹캠 종료",
-        use_container_width=True
-    ):
-        st.warning("웹캠 종료")
-
-
 
 # =========================================================
 # 대시보드
@@ -142,10 +130,6 @@ if page == "📊 대시보드":
 
     left, right = st.columns([1.5, 1])
 
-    # -------------------------------------------------
-    # 카메라 영역
-    # -------------------------------------------------
-
     with left:
 
         st.markdown("""
@@ -155,10 +139,6 @@ if page == "📊 대시보드":
         </div>
         </div>
         """, unsafe_allow_html=True)
-
-    # -------------------------------------------------
-    # 통계 카드
-    # -------------------------------------------------
 
     with right:
 
@@ -174,7 +154,6 @@ if page == "📊 대시보드":
             [c1, c2, c3],
             metrics
         ):
-
             with col:
 
                 st.metric(
@@ -183,10 +162,6 @@ if page == "📊 대시보드":
                 )
 
     st.divider()
-
-    # -------------------------------------------------
-    # 출석 현황
-    # -------------------------------------------------
 
     st.subheader("📋 출석 현황")
 
@@ -211,15 +186,55 @@ if page == "📊 대시보드":
 
 elif page == "⏱ 실시간 출석":
 
-    st.title("실시간 출석")
+    st.title("⏱ 실시간 출석")
 
     st.info(
-        "YOLO 손들기 인식 화면"
+        "카메라를 켜고 양손을 3초 이상 들어 출석하세요."
     )
 
-    st.markdown(
-        "정담원님 YOLO 코드 연동 예정"
+    camera_image = st.camera_input(
+        "📷 카메라 시작"
     )
+
+    if camera_image is not None:
+
+        file_bytes = np.asarray(
+            bytearray(camera_image.read()),
+            dtype=np.uint8
+        )
+
+        frame = cv2.imdecode(
+            file_bytes,
+            cv2.IMREAD_COLOR
+        )
+
+        detected, result_frame = detect_hand_raise(
+            frame
+        )
+
+        st.image(
+            result_frame,
+            channels="BGR",
+            use_container_width=True
+        )
+
+        if detected:
+
+            success = save_attendance(
+                "학생1"
+            )
+
+            if success:
+
+                st.success(
+                    "출석이 저장되었습니다."
+                )
+
+            else:
+
+                st.warning(
+                    "이미 출석했거나 저장에 실패했습니다."
+                )
 
 
 # =========================================================
@@ -228,7 +243,7 @@ elif page == "⏱ 실시간 출석":
 
 elif page == "👨‍🎓 학생 관리":
 
-    st.title("학생 관리")
+    st.title("👨‍🎓 학생 관리")
 
     if len(students) > 0:
 
@@ -250,7 +265,7 @@ elif page == "👨‍🎓 학생 관리":
 
 elif page == "📈 참여도 분석":
 
-    st.title("참여도 분석")
+    st.title("📈 참여도 분석")
 
     st.metric(
         "현재 출석률",
