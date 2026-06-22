@@ -15,4 +15,7 @@ def attendance_rate(total_students):
     if total_students == 0:
         return 0
 
-    return len(students) / total_students
+    return round(
+        (len(students) / total_students) * 100,
+        1
+    )
