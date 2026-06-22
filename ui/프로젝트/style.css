@@ -5,24 +5,29 @@ html,body,
     background:#f5f7fb !important;
     color:#1f2937 !important;
 }
+
 /* Streamlit 앱 배경 */
 .stApp{background:#f5f7fb;}
 [data-testid="stSidebar"]{
 background:#ffffff;
 border-right:1px solid #e5e7eb;
 }
+
 /* 다크모드 비활성화 */
 :root{
 color-scheme:light;
 }
+
 /* 상단 헤더 투명 */
 header[data-testid="stHeader"] {
     background: transparent !important;
 }
+
 /* 우측 상단 툴바 위치 */
 [data-testid="stToolbar"] {
     right: 1rem;
 }
+
 /* 상단 대시보드 카드 */
 .top-header{
 background:white;
@@ -34,17 +39,13 @@ align-items:center;
 box-shadow:0 8px 24px rgba(0,0,0,.06);
 margin-bottom:20px;
 }
+
 /* 헤더 제목 */
 .top-header h1{margin:0;}
+
 /* 헤더 설명 */
 .top-header p{color:#6b7280;}
-/* 시스템 상태 박스 */
-.status-box{
-background:#e9f8ef;
-padding:14px 20px;
-border-radius:14px;
-font-weight:600;
-}
+
 /* 로고 */
 .logo{
 font-size:28px;
@@ -54,13 +55,15 @@ margin-bottom:20px;
 color:#111827 !important;
 }
 
-/* 카메라, 퀴즈 카드 */
-.camera-box,.quiz-card{
-background:white;
-border-radius:24px;
-padding:20px;
-box-shadow:0 8px 24px rgba(0,0,0,.06);
+/* 기존 카드 */
+.camera-box,
+.quiz-card{
+    background:white;
+    border-radius:24px;
+    padding:20px;
+    box-shadow:0 8px 24px rgba(0,0,0,.06);
 }
+
 /* 카메라 자리 표시 */
 .camera-placeholder{
 height:430px;
@@ -73,6 +76,7 @@ font-size:28px;
 font-weight:700;
 color:#4f46e5;
 }
+
 /* 통계 카드 */
 .metric-card{
 background:white;
@@ -82,23 +86,29 @@ text-align:center;
 box-shadow:0 4px 15px rgba(0,0,0,.05);
 border:1px solid #ececec;
 margin-bottom:30px;
+
+height:110px;
+display:flex;
+flex-direction:column;
+justify-content:center;
 }
+
 /* 카드 제목 */
 .metric-label{font-size:13px;color:#6b7280;}
+
 /* 카드 값 */
 .metric-value{font-size:28px;font-weight:700;}
+
+.metric-status{
+    font-size:20px;
+    font-weight:700;
+}
+
 /* 섹션 제목 */
 .card-title,.section-title{
 font-size:24px;
 font-weight:700;
 margin-bottom:12px;
-}
-/* 데이터프레임 */
-div[data-testid="stDataFrame"]{
-background:white;
-padding:10px;
-border-radius:20px;
-box-shadow:0 8px 24px rgba(0,0,0,.06);
 }
 
 /* 버튼 기본 */
@@ -181,15 +191,175 @@ div[role="radiogroup"] > label:hover{
     transition:all .2s ease;
 }
 
-.metric-card{
-    height:110px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
+/* =========================
+   실시간 출석 화면
+========================= */
+
+.attendance-card{
+    background:white;
+    border-radius:24px;
+    padding:25px;
+    box-shadow:0 8px 24px rgba(0,0,0,.06);
+    margin-bottom:20px;
 }
 
-div[data-testid="stContainer"]{
+.attendance-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.attendance-header h2{
+    margin:0;
+    font-size:30px;
+}
+
+.refresh-icon{
+    font-size:24px;
+}
+
+.stat-box{
+    border-radius:18px;
+    padding:20px;
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.stat-title{
+    font-size:14px;
+    font-weight:600;
+}
+
+.stat-value{
+    margin-top:10px;
+    font-size:42px;
+    font-weight:700;
+}
+
+/* 카드 색상 */
+
+.blue{
+    background:#eef5ff;
+    border:2px solid #c8dcff;
+}
+
+.green{
+    background:#eef8f0;
+    border:2px solid #cfe7d3;
+}
+
+.orange{
+    background:#fff6e8;
+    border:2px solid #ffdca6;
+}
+
+/* ==========================
+   수업 진행 화면
+========================== */
+
+.live-camera-card{
     background:white;
     border-radius:24px;
     padding:20px;
+    box-shadow:0 8px 24px rgba(0,0,0,.06);
+}
+
+.camera-title{
+    font-size:26px;
+    font-weight:700;
+    margin-bottom:15px;
+}
+
+.camera-preview{
+    height:370px;
+    border-radius:20px;
+    background:#f3f4f6;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:120px;
+}
+
+.rec-text{
+    margin-top:12px;
+    font-weight:700;
+    color:#ef4444;
+}
+
+.status-card{
+    background:white;
+    height:245px;
+    border-radius:20px;
+    padding:25px;
+    text-align:center;
+    box-shadow:0 8px 24px rgba(0,0,0,.06);
+    margin-bottom:12px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+}
+
+.status-label{
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:15px;
+}
+
+.status-active{
+    font-size:34px;
+    color:#16a34a;
+    font-weight:700;
+}
+
+.status-sub{
+    margin-top:10px;
+    color:#6b7280;
+    font-weight:600;
+}
+
+.attendance-count{
+    font-size:54px;
+    font-weight:700;
+    margin-top:10px;
+}
+
+.message-card{
+    background:white;
+    border-radius:24px;
+    padding:20px;
+    margin-top:20px;
+    box-shadow:0 8px 24px rgba(0,0,0,.06);
+}
+
+.message-title{
+    font-size:22px;
+    font-weight:700;
+    margin-bottom:15px;
+}
+
+.message-content{
+    color:#374151;
+    font-size:17px;
+}
+
+/* 입력창 */
+
+.stTextInput input,
+.stTextArea textarea{
+    border-radius: 12px !important;
+}
+
+/* 버튼 */
+
+.stButton button{
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+}
+
+[data-testid="stAlert"]{
+    display:none !important;
 }
