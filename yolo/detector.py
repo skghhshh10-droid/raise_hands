@@ -4,7 +4,7 @@ import streamlit as st
 
 
 # =========================================================
-# 모델 로드
+# YOLO Pose 모델 로드
 # =========================================================
 
 @st.cache_resource
@@ -21,21 +21,15 @@ model = load_model()
 
 def left_hand_raised(person):
 
-    if len(person) < 11:
+    try:
+
+        left_shoulder = person[5]
+        left_wrist = person[9]
+
+        return left_wrist[1] < left_shoulder[1]
+
+    except:
         return False
-
-    nose = person[0]
-
-    ls = person[5]
-    le = person[7]
-    lw = person[9]
-
-    return (
-        lw[1] < le[1]
-        and le[1] < ls[1]
-        and lw[1] < nose[1]
-        and abs(ls[1] - lw[1]) > 40
-    )
 
 
 # =========================================================
@@ -44,21 +38,15 @@ def left_hand_raised(person):
 
 def right_hand_raised(person):
 
-    if len(person) < 11:
+    try:
+
+        right_shoulder = person[6]
+        right_wrist = person[10]
+
+        return right_wrist[1] < right_shoulder[1]
+
+    except:
         return False
-
-    nose = person[0]
-
-    rs = person[6]
-    re = person[8]
-    rw = person[10]
-
-    return (
-        rw[1] < re[1]
-        and re[1] < rs[1]
-        and rw[1] < nose[1]
-        and abs(rs[1] - rw[1]) > 40
-    )
 
 
 # =========================================================
@@ -71,7 +59,7 @@ def detect_hand_raise(frame):
 
     results = model(
         frame,
-        conf=0.70
+        conf=0.4
     )
 
     annotated_frame = results[0].plot()
@@ -80,9 +68,9 @@ def detect_hand_raise(frame):
 
     if keypoints is not None:
 
-        xy = keypoints.xy.cpu().numpy()
+        persons = keypoints.xy.cpu().numpy()
 
-        for person in xy:
+        for person in persons:
 
             if len(person) < 11:
                 continue
@@ -90,20 +78,43 @@ def detect_hand_raise(frame):
             left = left_hand_raised(person)
             right = right_hand_raised(person)
 
-            if left and right:
+            # 발표용: 한 손만 들어도 인정
+            if left or right:
 
                 detected = True
 
                 cv2.putText(
                     annotated_frame,
                     "HAND RAISED",
-                    (50, 50),
+                    (30, 50),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     1,
                     (0, 255, 0),
                     3
                 )
 
+                cv2.putText(
+                    annotated_frame,
+                    f"LEFT:{left} RIGHT:{right}",
+                    (30, 90),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.8,
+                    (0, 255, 0),
+                    2
+                )
+
                 break
+
+        if not detected:
+
+            cv2.putText(
+                annotated_frame,
+                "NO HAND RAISED",
+                (30, 50),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                1,
+                (0, 0, 255),
+                3
+            )
 
     return detected, annotated_frame
