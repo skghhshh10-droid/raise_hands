@@ -23,12 +23,6 @@ from database.attendance import (
 )
 
 
-from database.attendance import (
-    register_student,
-    save_attendance,
-    get_attendance,
-    get_students
-)
 
 from dashboard.statistics import (
     attendance_count,
