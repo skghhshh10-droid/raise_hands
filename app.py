@@ -663,80 +663,94 @@ if len(students) > 0:
 
 elif page == "➕ 학생 등록":
 
-    st.title("➕ 학생 등록")
+```
+if not st.session_state.is_admin:
 
-    st.info(
-        "학생을 등록하면 실시간 출석 메뉴에서 "
-        "손들기 인식을 통해 자동 출석이 가능합니다."
+    st.error(
+        "🔒 관리자만 접근 가능합니다."
     )
 
-    col1, col2 = st.columns(2)
+    st.stop()
 
-    with col1:
+st.title("➕ 학생 등록")
 
-        student_id = st.text_input(
-            "🎫 학번"
-        )
+st.info(
+    "학생을 등록하면 출석 체크 메뉴에서 "
+    "손들기 인식을 통해 출석 처리가 가능합니다."
+)
 
-    with col2:
+col1, col2 = st.columns(2)
 
-        name = st.text_input(
-            "👤 이름"
-        )
+with col1:
 
-    st.divider()
+    student_id = st.text_input(
+        "🎫 학번"
+    )
 
-    if st.button(
-        "✅ 학생 등록",
-        use_container_width=True
-    ):
+with col2:
 
-        if not student_id or not name:
+    name = st.text_input(
+        "👤 이름"
+    )
 
-            st.warning(
-                "학번과 이름을 입력하세요."
-            )
+st.divider()
 
-        else:
+if st.button(
+    "✅ 학생 등록",
+    width="stretch"
+):
 
-            success = register_student(
-                student_id,
-                name
-            )
+    if not student_id or not name:
 
-            if success:
-
-                st.success(
-                    f"{name} 학생 등록 완료"
-                )
-
-                st.balloons()
-
-                st.rerun()
-
-            else:
-
-                st.error(
-                    "이미 등록된 학번입니다."
-                )
-
-    st.divider()
-
-    st.subheader("📋 등록 학생 현황")
-
-    if len(students_df) > 0:
-
-        st.dataframe(
-            students_df,
-            use_container_width=True,
-            hide_index=True
+        st.warning(
+            "학번과 이름을 입력하세요."
         )
 
     else:
 
-        st.info(
-            "아직 등록된 학생이 없습니다."
+        success = register_student(
+            student_id,
+            name
         )
+
+        if success:
+
+            st.success(
+                f"✅ {name} 학생 등록 완료"
+            )
+
+            st.balloons()
+
+            st.rerun()
+
+        else:
+
+            st.error(
+                "이미 등록된 학번입니다."
+            )
+
+st.divider()
+
+st.subheader("📋 등록 학생 현황")
+
+if len(students_df) > 0:
+
+    st.dataframe(
+        students_df,
+        width="stretch",
+        hide_index=True
+    )
+
+    st.caption(
+        f"총 {len(students_df)}명 등록"
+    )
+
+else:
+
+    st.info(
+        "아직 등록된 학생이 없습니다."
+    )
+```
 
 
 # =========================================================
