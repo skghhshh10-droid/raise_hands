@@ -557,103 +557,99 @@ elif page == "📝 출석 체크":
 
 elif page == "👨‍🎓 학생 관리":
 
+    if not st.session_state.is_admin:
 
-if not st.session_state.is_admin:
-
-    st.error(
-        "🔒 관리자만 접근 가능합니다."
-    )
-
-    st.stop()
-
-st.title("👨‍🎓 학생 관리")
-
-search = st.text_input(
-    "🔍 학생 검색"
-)
-
-view_df = students_df.copy()
-
-if (
-    search
-    and len(students_df) > 0
-    and "name" in students_df.columns
-):
-
-    view_df = students_df[
-        students_df["name"]
-        .astype(str)
-        .str.contains(
-            search,
-            case=False
+        st.error(
+            "🔒 관리자만 접근 가능합니다."
         )
-    ]
 
-if len(view_df) > 0:
+        st.stop()
 
-    st.dataframe(
-        view_df,
-        width="stretch",
-        hide_index=True
+    st.title("👨‍🎓 학생 관리")
+
+    search = st.text_input(
+        "🔍 학생 검색"
     )
 
-    st.caption(
-        f"총 {len(view_df)}명 조회"
-    )
+    view_df = students_df.copy()
 
-else:
-
-    st.info(
-        "검색 결과가 없습니다."
-    )
-
-st.divider()
-
-st.subheader("🗑 학생 삭제")
-
-students = get_students()
-
-if len(students) > 0:
-
-    delete_target = st.selectbox(
-        "삭제할 학생 선택",
-        [
-            f"{s['student_id']} - {s['name']}"
-            for s in students
-        ]
-    )
-
-    st.warning(
-        "삭제된 학생은 복구할 수 없습니다."
-    )
-
-    if st.button(
-        "🗑 학생 삭제",
-        width="stretch"
+    if (
+        search
+        and len(students_df) > 0
+        and "name" in students_df.columns
     ):
 
-        student_id = (
-            delete_target.split(" - ")[0]
+        view_df = students_df[
+            students_df["name"]
+            .astype(str)
+            .str.contains(
+                search,
+                case=False
+            )
+        ]
+
+    if len(view_df) > 0:
+
+        st.dataframe(
+            view_df,
+            width="stretch",
+            hide_index=True
         )
 
-        success = delete_student(
-            student_id
+        st.caption(
+            f"총 {len(view_df)}명 조회"
         )
 
-        if success:
+    else:
 
-            st.success(
-                "학생 삭제 완료"
+        st.info(
+            "검색 결과가 없습니다."
+        )
+
+    st.divider()
+
+    st.subheader("🗑 학생 삭제")
+
+    students = get_students()
+
+    if len(students) > 0:
+
+        delete_target = st.selectbox(
+            "삭제할 학생 선택",
+            [
+                f"{s['student_id']} - {s['name']}"
+                for s in students
+            ]
+        )
+
+        st.warning(
+            "삭제된 학생은 복구할 수 없습니다."
+        )
+
+        if st.button(
+            "🗑 학생 삭제",
+            width="stretch"
+        ):
+
+            student_id = delete_target.split(" - ")[0]
+
+            success = delete_student(
+                student_id
             )
 
-            st.rerun()
+            if success:
 
-        else:
+                st.success(
+                    "학생 삭제 완료"
+                )
 
-            st.error(
-                "학생 삭제 실패"
-            )
+                st.rerun()
 
+            else:
+
+                st.error(
+                    "학생 삭제 실패"
+                )
 
 
 
@@ -665,92 +661,92 @@ if len(students) > 0:
 
 elif page == "➕ 학생 등록":
 
-if not st.session_state.is_admin:
+    if not st.session_state.is_admin:
 
-    st.error(
-        "🔒 관리자만 접근 가능합니다."
-    )
-
-    st.stop()
-
-st.title("➕ 학생 등록")
-
-st.info(
-    "학생을 등록하면 출석 체크 메뉴에서 "
-    "손들기 인식을 통해 출석 처리가 가능합니다."
-)
-
-col1, col2 = st.columns(2)
-
-with col1:
-
-    student_id = st.text_input(
-        "🎫 학번"
-    )
-
-with col2:
-
-    name = st.text_input(
-        "👤 이름"
-    )
-
-st.divider()
-
-if st.button(
-    "✅ 학생 등록",
-    width="stretch"
-):
-
-    if not student_id or not name:
-
-        st.warning(
-            "학번과 이름을 입력하세요."
+        st.error(
+            "🔒 관리자만 접근 가능합니다."
         )
 
-    else:
+        st.stop()
 
-        success = register_student(
-            student_id,
-            name
-        )
-
-        if success:
-
-            st.success(
-                f"✅ {name} 학생 등록 완료"
-            )
-
-            st.balloons()
-
-            st.rerun()
-
-        else:
-
-            st.error(
-                "이미 등록된 학번입니다."
-            )
-
-st.divider()
-
-st.subheader("📋 등록 학생 현황")
-
-if len(students_df) > 0:
-
-    st.dataframe(
-        students_df,
-        width="stretch",
-        hide_index=True
-    )
-
-    st.caption(
-        f"총 {len(students_df)}명 등록"
-    )
-
-else:
+    st.title("➕ 학생 등록")
 
     st.info(
-        "아직 등록된 학생이 없습니다."
+        "학생을 등록하면 출석 체크 메뉴에서 "
+        "손들기 인식을 통해 출석 처리가 가능합니다."
     )
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        student_id = st.text_input(
+            "🎫 학번"
+        )
+
+    with col2:
+
+        name = st.text_input(
+            "👤 이름"
+        )
+
+    st.divider()
+    
+    if st.button(
+        "✅ 학생 등록",
+        width="stretch"
+    ):
+    
+        if not student_id or not name:
+    
+            st.warning(
+                "학번과 이름을 입력하세요."
+            )
+    
+        else:
+    
+            success = register_student(
+                student_id,
+                name
+            )
+    
+            if success:
+    
+                st.success(
+                    f"✅ {name} 학생 등록 완료"
+                )
+
+                st.balloons()
+    
+                st.rerun()
+    
+            else:
+    
+                st.error(
+                    "이미 등록된 학번입니다."
+                )
+    
+    st.divider()
+
+    st.subheader("📋 등록 학생 현황")
+    
+    if len(students_df) > 0:
+    
+        st.dataframe(
+            students_df,
+            width="stretch",
+            hide_index=True
+        )
+    
+        st.caption(
+            f"총 {len(students_df)}명 등록"
+        )
+    
+    else:
+    
+        st.info(
+            "아직 등록된 학생이 없습니다."
+        )
 
 
 
