@@ -1,30 +1,34 @@
 from ultralytics import YOLO
 import cv2
-import time
 import streamlit as st
 
-# YOLOv11 Pose 모델 로드
+
+# =========================================================
+# 모델 로드
+# =========================================================
+
 @st.cache_resource
 def load_model():
     return YOLO("yolo11n-pose.pt")
 
+
 model = load_model()
 
-if "raise_start" not in st.session_state:
-    st.session_state.raise_start = {}
 
-if "confirmed_ids" not in st.session_state:
-    st.session_state.confirmed_ids = set()
+# =========================================================
+# 왼손 들기
+# =========================================================
 
-if "attendance" not in st.session_state:
-    st.session_state.attendance = {}
-
-# 왼쪽 손들기
 def left_hand_raised(person):
+
     if len(person) < 11:
         return False
 
-    nose, ls, le, lw = person[0], person[5], person[7], person[9]
+    nose = person[0]
+
+    ls = person[5]
+    le = person[7]
+    lw = person[9]
 
     return (
         lw[1] < le[1]
@@ -34,12 +38,20 @@ def left_hand_raised(person):
     )
 
 
-# 오른쪽 손들기
+# =========================================================
+# 오른손 들기
+# =========================================================
+
 def right_hand_raised(person):
+
     if len(person) < 11:
         return False
 
-    nose, rs, re, rw = person[0], person[6], person[8], person[10]
+    nose = person[0]
+
+    rs = person[6]
+    re = person[8]
+    rw = person[10]
 
     return (
         rw[1] < re[1]
@@ -49,12 +61,15 @@ def right_hand_raised(person):
     )
 
 
-# 팀원2 필수 함수
+# =========================================================
+# 손들기 감지
+# =========================================================
+
 def detect_hand_raise(frame):
 
     detected = False
 
-    results = model.track(
+    results = model(
         frame,
         conf=0.70
     )
@@ -62,102 +77,33 @@ def detect_hand_raise(frame):
     annotated_frame = results[0].plot()
 
     keypoints = results[0].keypoints
-    boxes = results[0].boxes
 
-    if (
-        keypoints is not None
-        and boxes is not None
-        and boxes.id is not None
-    ):
+    if keypoints is not None:
 
         xy = keypoints.xy.cpu().numpy()
-        ids = boxes.id.cpu().numpy()
 
-        for i, (person, track_id) in enumerate(zip(xy, ids)):
-
-            track_id = int(track_id)
+        for person in xy:
 
             if len(person) < 11:
-                continue
-
-            x1, y1, x2, y2 = boxes[i].xyxy[0].cpu().numpy()
-
-            if (x2 - x1) * (y2 - y1) < 10000:
                 continue
 
             left = left_hand_raised(person)
             right = right_hand_raised(person)
 
-            both = left and right
+            if left and right:
 
-            status = "NONE"
-
-            if both:
-                status = "BOTH"
-            elif left:
-                status = "LEFT"
-            elif right:
-                status = "RIGHT"
-
-            # 양손 3초 유지 시 출석 인정
-            if both:
-
-                if track_id not in st.session_state.raise_start:
-                    st.session_state.raise_start[track_id] = time.time()
-
-                duration = (
-                    time.time()
-                    - st.session_state.raise_start[track_id]
-                )
-
-                if duration >= 3:
-
-                    detected = True
-
-                    if track_id not in st.session_state.confirmed_ids:
-
-                        st.session_state.confirmed_ids.add(track_id)
-
-                        st.session_state.attendance[track_id] = True
-
-            else:
-
-                if track_id in st.session_state.raise_start:
-                    del st.session_state.raise_start[track_id]
-
-            x = int(person[0][0])
-            y = int(person[0][1])
-
-            cv2.putText(
-                annotated_frame,
-                f"ID:{track_id}",
-                (x, y - 60),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.7,
-                (0, 255, 0),
-                2
-            )
-
-            cv2.putText(
-                annotated_frame,
-                status,
-                (x, y - 30),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.8,
-                (255, 0, 0),
-                2
-            )
-
-            if track_id in st.session_state.attendance:
+                detected = True
 
                 cv2.putText(
                     annotated_frame,
-                    "ATTENDED",
-                    (x, y + 30),
+                    "HAND RAISED",
+                    (50, 50),
                     cv2.FONT_HERSHEY_SIMPLEX,
-                    0.8,
-                    (0, 0, 255),
-                    2
+                    1,
+                    (0, 255, 0),
+                    3
                 )
+
+                break
 
     return detected, annotated_frame
