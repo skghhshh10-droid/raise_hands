@@ -19,7 +19,8 @@ from database.attendance import (
     register_student,
     save_attendance,
     get_attendance,
-    delete_student
+    delete_student,
+    delete_attendance
 )
 
 
