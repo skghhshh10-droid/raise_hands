@@ -1,16 +1,27 @@
+# app.py
+
+
 # =========================================================
 # AI Smart Classroom
-# 최종 통합 버전
 # =========================================================
 
+import plotly.graph_objects as go
+import plotly.express as px
+from datetime import datetime
 import streamlit as st
 import pandas as pd
-import cv2
+from PIL import Image
 import numpy as np
+from yolo.detector import detect_hand_raise
+import cv2
+
+
 
 from database.attendance import (
+    register_student,
     save_attendance,
-    get_attendance
+    get_attendance,
+    get_students
 )
 
 from dashboard.statistics import (
@@ -18,7 +29,7 @@ from dashboard.statistics import (
     attendance_rate
 )
 
-from yolo.detector import detect_hand_raise
+
 
 
 # =========================================================
@@ -35,57 +46,174 @@ st.set_page_config(
 # =========================================================
 
 try:
+
     with open("style.css", encoding="utf-8") as f:
+
         st.markdown(
             f"<style>{f.read()}</style>",
             unsafe_allow_html=True
         )
+
 except:
     pass
 
 
-# =========================================================
-# DB 데이터 로드
-# =========================================================
 
-try:
 
-    attendance_data = get_attendance()
-
-    if attendance_data:
-        students = pd.DataFrame(attendance_data)
-    else:
-        students = pd.DataFrame()
-
-except Exception:
-
-    students = pd.DataFrame()
 
 
 # =========================================================
-# 통계
+# 데이터
 # =========================================================
+
+attendance_df = pd.DataFrame(
+    get_attendance()
+)
+
+students_df = pd.DataFrame(
+    get_students()
+)
 
 count = attendance_count()
 
-TOTAL_STUDENTS = 30
+TOTAL_STUDENTS = max(
+    len(students_df),
+    1
+)
 
-rate = attendance_rate(TOTAL_STUDENTS)
+rate = attendance_rate(
+    TOTAL_STUDENTS
+)
 
 
 # =========================================================
 # 헤더
 # =========================================================
 
-st.markdown("""
-<div class="top-header">
-<div>
-<h1>👋 AI Smart Classroom</h1>
-<p>손들기 인식을 통한 스마트 출석 시스템</p>
+
+st.markdown(f"""
+<div style="
+text-align:center;
+padding:30px;
+background:linear-gradient(
+180deg,
+#eef6ff,
+#f8fafc
+);
+border-radius:24px;
+margin-bottom:20px;
+">
+
+<h1 style="
+margin-bottom:10px;
+font-size:42px;
+font-weight:800;
+color:#111827;
+">
+🎓 AI SMART CLASSROOM
+</h1>
+
+<p style="
+font-size:18px;
+color:#64748b;
+margin-bottom:20px;
+">
+실시간 YOLO Pose 기반 스마트 출석 및 참여도 관리 시스템
+</p>
+
+<div style="
+display:flex;
+justify-content:center;
+gap:12px;
+flex-wrap:wrap;
+margin-bottom:25px;
+">
+
+<span style="
+padding:8px 16px;
+background:white;
+border:1px solid #e5e7eb;
+border-radius:999px;
+font-size:14px;
+font-weight:600;
+">
+✅ 실시간 손들기 인식
+</span>
+
+<span style="
+padding:8px 16px;
+background:white;
+border:1px solid #e5e7eb;
+border-radius:999px;
+font-size:14px;
+font-weight:600;
+">
+✅ 자동 출석 체크
+</span>
+
+<span style="
+padding:8px 16px;
+background:white;
+border:1px solid #e5e7eb;
+border-radius:999px;
+font-size:14px;
+font-weight:600;
+">
+✅ 참여도 분석
+</span>
+
 </div>
+
+<div style="
+display:flex;
+justify-content:center;
+gap:16px;
+flex-wrap:wrap;
+">
+
+<div style="
+background:white;
+padding:15px;
+border-radius:18px;
+min-width:130px;
+box-shadow:0 4px 15px rgba(0,0,0,.05);
+">
+<div style="font-size:32px;font-weight:800;">
+{len(students_df)}
+</div>
+<div>등록 학생</div>
+</div>
+
+<div style="
+background:white;
+padding:15px;
+border-radius:18px;
+min-width:130px;
+box-shadow:0 4px 15px rgba(0,0,0,.05);
+">
+<div style="font-size:32px;font-weight:800;">
+{count}
+</div>
+<div>출석 학생</div>
+</div>
+
+<div style="
+background:white;
+padding:15px;
+border-radius:18px;
+min-width:130px;
+box-shadow:0 4px 15px rgba(0,0,0,.05);
+">
+<div style="font-size:32px;font-weight:800;">
+{rate}%
+</div>
+<div>출석률</div>
+</div>
+
+</div>
+
 </div>
 """, unsafe_allow_html=True)
-
 
 # =========================================================
 # 사이드바
@@ -93,28 +221,34 @@ st.markdown("""
 
 with st.sidebar:
 
-    st.markdown(
-        """
-        <div class="logo">
-        ✋ 손들기<br>
-        출석 시스템
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.markdown("""
+    <div style="
+    text-align:center;
+    padding:20px;
+    margin-bottom:20px;
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+    border-radius:20px;
+    color:white;
+    ">
+    <h3>🎓 관리자</h3>
+    <p>AI Smart Classroom</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+   
 
     page = st.radio(
-        "",
+        "메뉴",
         [
             "📊 대시보드",
-            "⏱ 실시간 출석",
+            "📝 출석 체크",
             "👨‍🎓 학생 관리",
+            "➕ 학생 등록",
             "📈 참여도 분석"
         ],
         label_visibility="collapsed"
     )
 
-    st.divider()
 
 
 # =========================================================
@@ -123,118 +257,210 @@ with st.sidebar:
 
 if page == "📊 대시보드":
 
-    st.markdown(
-        '<div class="card-title">실시간 카메라</div>',
-        unsafe_allow_html=True
-    )
+    # KPI 카드
+    k1, k2, k3 = st.columns(3)
 
-    left, right = st.columns([1.5, 1])
-
-    with left:
-
-        st.markdown("""
-        <div class="camera-box">
-        <div class="camera-placeholder">
-        YOLO 결과 영상 표시 영역
-        </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with right:
-
-        c1, c2, c3 = st.columns(3)
-
-        metrics = [
-            ("출석 인원", f"{count}명"),
-            ("출석률", f"{rate}%"),
-            ("시스템", "정상")
-        ]
-
-        for col, metric in zip(
-            [c1, c2, c3],
-            metrics
-        ):
-            with col:
-
-                st.metric(
-                    metric[0],
-                    metric[1]
-                )
+    k1.metric("👨‍🎓 등록 학생", len(students_df))
+    k2.metric("🙋 출석 학생", count)
+    k3.metric("📈 출석률", f"{rate}%")
 
     st.divider()
 
-    st.subheader("📋 출석 현황")
+    # =========================
+    # 출석률 분석 + 출석 요약
+    # =========================
 
-    if len(students) > 0:
+    c1, c2 = st.columns(2)
+
+    with c1:
+
+        st.subheader("📈 출석률 분석")
+
+        gauge = go.Figure(
+            go.Indicator(
+                mode="gauge+number",
+                value=rate,
+                title={"text": "출석률"},
+                gauge={
+                    "axis": {"range": [0, 100]},
+                    "bar": {"color": "#6366f1"}
+                }
+            )
+        )
+
+        gauge.update_layout(
+            height=280,
+            margin=dict(
+            l=20,
+            r=20,
+            t=40,
+            b=20
+            )
+        )
+
+        st.markdown(
+            f"""
+            <h2 style='
+            text-align:center;
+            color:#4f46e5;
+            font-weight:800'>
+            현재 출석률 {rate}%
+            </h2>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.plotly_chart(
+            gauge,
+            width="stretch"
+        )
+
+    with c2:
+
+        st.subheader("📋 출석 요약")
+
+        st.metric("등록 학생", len(students_df))
+        st.metric("출석 학생", count)
+        st.metric("출석률", f"{rate}%")
+
+        st.progress(rate / 100)
+
+        st.caption(
+            f"전체 {TOTAL_STUDENTS}명 중 "
+            f"{count}명 출석"
+        )
+
+    st.divider()
+
+    # =========================
+    # 최근 출석
+    # =========================
+
+    st.subheader("🕒 최근 출석")
+
+    if len(attendance_df) > 0:
 
         st.dataframe(
-            students,
+            attendance_df.tail(5),
             use_container_width=True,
-            hide_index=True
+            hide_index=True,
+            height=220
+        )
+
+        with st.expander("📋 전체 출석 현황 보기"):
+
+            st.dataframe(
+                attendance_df,
+                use_container_width=True,
+                hide_index=True
+            )
+
+    else:
+
+        st.info("출석 데이터가 없습니다.")
+
+# =========================================================
+# 출석 체크
+# =========================================================
+
+elif page == "📝 출석 체크":
+
+    st.title("📝 출석 체크")
+
+    students = get_students()
+
+    if len(students) == 0:
+
+        st.warning(
+            "먼저 학생을 등록하세요."
         )
 
     else:
 
+        student_name = st.selectbox(
+            "👤 학생 선택",
+            [s["name"] for s in students]
+        )
+
         st.info(
-            "출석 데이터가 없습니다."
+            """
+            📷 카메라로 사진을 촬영하면
+            YOLO Pose가 손들기 여부를 분석합니다.
+            """
         )
 
-
-# =========================================================
-# 실시간 출석
-# =========================================================
-
-elif page == "⏱ 실시간 출석":
-
-    st.title("⏱ 실시간 출석")
-
-    st.info(
-        "카메라를 켜고 양손을 3초 이상 들어 출석하세요."
-    )
-
-    camera_image = st.camera_input(
-        "📷 카메라 시작"
-    )
-
-    if camera_image is not None:
-
-        file_bytes = np.asarray(
-            bytearray(camera_image.read()),
-            dtype=np.uint8
+        camera_image = st.camera_input(
+            "📷 사진 촬영"
         )
 
-        frame = cv2.imdecode(
-            file_bytes,
-            cv2.IMREAD_COLOR
-        )
+        if camera_image is not None:
 
-        detected, result_frame = detect_hand_raise(
-            frame
-        )
-
-        st.image(
-            result_frame,
-            channels="BGR",
-            use_container_width=True
-        )
-
-        if detected:
-
-            success = save_attendance(
-                "학생1"
+            file_bytes = np.asarray(
+                bytearray(camera_image.read()),
+                dtype=np.uint8
             )
 
-            if success:
+            frame = cv2.imdecode(
+                file_bytes,
+                cv2.IMREAD_COLOR
+            )
 
-                st.success(
-                    "출석이 저장되었습니다."
+            detected, result_frame = detect_hand_raise(
+                frame
+            )
+
+            st.image(
+                result_frame,
+                channels="BGR",
+                width="stretch"
+            )
+
+            if detected:
+
+                success = save_attendance(
+                    student_name
                 )
+
+                if success:
+
+                    st.success(
+                        f"✅ {student_name} 출석 완료"
+                    )
+
+                    st.balloons()
+
+                    st.rerun()
+
+                else:
+
+                    st.warning(
+                        "이미 출석한 학생입니다."
+                    )
 
             else:
 
-                st.warning(
-                    "이미 출석했거나 저장에 실패했습니다."
+                st.error(
+                    "🙅 손들기 자세가 감지되지 않았습니다."
                 )
+
+        st.divider()
+
+        st.subheader("📋 오늘 출석 현황")
+
+        if len(attendance_df) > 0:
+
+            st.dataframe(
+                attendance_df,
+                width="stretch",
+                hide_index=True
+            )
+
+        else:
+
+            st.info(
+                "아직 출석 데이터가 없습니다."
+            )
+
 
 
 # =========================================================
@@ -245,17 +471,125 @@ elif page == "👨‍🎓 학생 관리":
 
     st.title("👨‍🎓 학생 관리")
 
-    if len(students) > 0:
+    search = st.text_input(
+        "🔍 학생 검색"
+    )
+
+    view_df = students_df.copy()
+
+    if (
+        search
+        and len(students_df) > 0
+        and "name" in students_df.columns
+    ):
+
+        view_df = students_df[
+            students_df["name"]
+            .astype(str)
+            .str.contains(
+                search,
+                case=False
+            )
+        ]
+
+    if len(view_df) > 0:
 
         st.dataframe(
-            students,
-            use_container_width=True
+            view_df,
+            use_container_width=True,
+            hide_index=True
+        )
+
+        st.caption(
+            f"총 {len(view_df)}명 조회"
         )
 
     else:
 
         st.info(
-            "등록된 학생이 없습니다."
+            "검색 결과가 없습니다."
+        )
+
+
+# =========================================================
+# 학생 등록
+# =========================================================
+
+elif page == "➕ 학생 등록":
+
+    st.title("➕ 학생 등록")
+
+    st.info(
+        "학생을 등록하면 실시간 출석 메뉴에서 "
+        "손들기 인식을 통해 자동 출석이 가능합니다."
+    )
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        student_id = st.text_input(
+            "🎫 학번"
+        )
+
+    with col2:
+
+        name = st.text_input(
+            "👤 이름"
+        )
+
+    st.divider()
+
+    if st.button(
+        "✅ 학생 등록",
+        use_container_width=True
+    ):
+
+        if not student_id or not name:
+
+            st.warning(
+                "학번과 이름을 입력하세요."
+            )
+
+        else:
+
+            success = register_student(
+                student_id,
+                name
+            )
+
+            if success:
+
+                st.success(
+                    f"{name} 학생 등록 완료"
+                )
+
+                st.balloons()
+
+                st.rerun()
+
+            else:
+
+                st.error(
+                    "이미 등록된 학번입니다."
+                )
+
+    st.divider()
+
+    st.subheader("📋 등록 학생 현황")
+
+    if len(students_df) > 0:
+
+        st.dataframe(
+            students_df,
+            use_container_width=True,
+            hide_index=True
+        )
+
+    else:
+
+        st.info(
+            "아직 등록된 학생이 없습니다."
         )
 
 
@@ -267,7 +601,41 @@ elif page == "📈 참여도 분석":
 
     st.title("📈 참여도 분석")
 
+    if len(students_df) > 0 and "name" in students_df.columns:
+
+        chart_data = pd.DataFrame({
+            "학생": students_df["name"],
+            "참여도": [80] * len(students_df)
+        })
+
+        st.subheader("🏆 학생 참여도")
+
+        fig = px.bar(
+            chart_data,
+            x="학생",
+            y="참여도",
+            title="학생 참여도 순위"
+        )
+
+        st.plotly_chart(
+            fig,
+            use_container_width=True
+        )
+
+    else:
+
+        st.info(
+            "등록된 학생 데이터가 없습니다."
+        )
+
+    st.divider()
+
     st.metric(
         "현재 출석률",
         f"{rate}%"
     )
+
+    st.progress(
+        min(rate / 100, 1.0)
+    )
+

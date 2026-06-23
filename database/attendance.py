@@ -1,41 +1,155 @@
-# 출석 저장 및 조회 모듈 (팀원 3 - 데이터 관리 담당)
+# =========================================================
+# 출석 저장 및 조회 모듈
+# =========================================================
+
 from database.supabase_client import get_supabase_client
 
-# Supabase 클라이언트 가져오기
+# Supabase 클라이언트
 supabase = get_supabase_client()
 
-def save_attendance(name):
-    """YOLO에서 이름(name)을 넘겨주면, Students 테이블에서 학번을 조회해 중복 없이 출석 저장하는 함수"""
+
+# =========================================================
+# 학생 등록
+# =========================================================
+
+def register_student(student_id, name):
+    """Students 테이블에 학생 등록"""
+
     try:
-        # 1. Students 테이블에서 넘겨받은 이름에 해당하는 학번(student_id) 찾기
-        student_query = supabase.table("Students").select("student_id").eq("name", name).execute()
-        
-        # 등록되지 않은 이름일 때
-        if len(student_query.data) == 0:
-            return False
-            
-        student_id = student_query.data[0]["student_id"]
-        
-        # 2. 오늘 이미 이 학번으로 출석한 기록이 있는지 attendance 테이블에서 중복 체크
-        check = supabase.table("attendance").select("*").eq("student_id", student_id).execute()
-        
-        # 이미 데이터가 있다면 중복이므로 False 반환
+
+        # 중복 학번 확인
+        check = (
+            supabase
+            .table("Students")
+            .select("*")
+            .eq("student_id", student_id)
+            .execute()
+        )
+
         if len(check.data) > 0:
             return False
-        
-        # 3. 처음 감지된 경우 attendance 테이블에 학번 최종 저장
-        data = {"student_id": student_id, "status": "출석"}
-        supabase.table("attendance").insert(data).execute()
-        
-        return True  # 출석 성공
-        
+
+        data = {
+            "student_id": student_id,
+            "name": name
+        }
+
+        supabase.table(
+            "Students"
+        ).insert(data).execute()
+
+        return True
+
     except Exception as e:
-        return False  # 시스템 에러 발생 시 실패 처리
+
+        print("REGISTER ERROR :", e)
+
+        return False
+
+
+# =========================================================
+# 출석 저장
+# =========================================================
+
+def save_attendance(name):
+    """
+    학생 이름으로 Students 테이블 조회 후
+    attendance 테이블에 출석 저장
+    """
+
+    try:
+
+        # 학생 조회
+        student_query = (
+            supabase
+            .table("Students")
+            .select("student_id")
+            .eq("name", name)
+            .execute()
+        )
+
+        if len(student_query.data) == 0:
+            print("학생이 등록되어 있지 않습니다.")
+            return False
+
+        student_id = student_query.data[0]["student_id"]
+
+        # 중복 출석 확인
+        check = (
+            supabase
+            .table("attendance")
+            .select("*")
+            .eq("student_id", student_id)
+            .execute()
+        )
+
+        if len(check.data) > 0:
+            print("이미 출석한 학생입니다.")
+            return False
+
+        data = {
+            "student_id": student_id,
+            "status": "출석"
+        }
+
+        supabase.table(
+            "attendance"
+        ).insert(data).execute()
+
+        return True
+
+    except Exception as e:
+
+        print("ATTENDANCE ERROR :", e)
+
+        return False
+
+
+# =========================================================
+# 출석 조회
+# =========================================================
 
 def get_attendance():
-    """현재까지 출석한 전체 학생 목록을 가져오는 함수 (웹 UI 연동용)"""
+    """attendance 테이블 조회"""
+
     try:
-        response = supabase.table("attendance").select("*").execute()
+
+        response = (
+            supabase
+            .table("attendance")
+            .select("*")
+            .execute()
+        )
+
         return response.data
+
     except Exception as e:
+
+        print("GET ATTENDANCE ERROR :", e)
+
+        return []
+
+
+# =========================================================
+# 학생 조회
+# =========================================================
+
+def get_students():
+    """Students 테이블 조회"""
+
+    try:
+
+        response = (
+            supabase
+            .table("Students")
+            .select("*")
+            .execute()
+        )
+
+        return response.data
+
+    except Exception as e:
+
+        print("GET STUDENTS ERROR :", e)
+
         return []

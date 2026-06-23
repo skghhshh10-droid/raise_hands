@@ -1,195 +1,350 @@
-/* 전체 앱 배경색 */
-html,body,
-[data-testid="stAppViewContainer"],
-.stApp{
-    background:#f5f7fb !important;
-    color:#1f2937 !important;
-}
-/* Streamlit 앱 배경 */
-.stApp{background:#f5f7fb;}
-[data-testid="stSidebar"]{
-background:#ffffff;
-border-right:1px solid #e5e7eb;
-}
-/* 다크모드 비활성화 */
+/* =======================================================
+AI Smart Classroom Premium UI
+======================================================= */
+
 :root{
-color-scheme:light;
-}
-/* 상단 헤더 투명 */
-header[data-testid="stHeader"] {
-    background: transparent !important;
-}
-/* 우측 상단 툴바 위치 */
-[data-testid="stToolbar"] {
-    right: 1rem;
-}
-/* 상단 대시보드 카드 */
-.top-header{
-background:white;
-padding:24px;
-border-radius:24px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-box-shadow:0 8px 24px rgba(0,0,0,.06);
-margin-bottom:20px;
-}
-/* 헤더 제목 */
-.top-header h1{margin:0;}
-/* 헤더 설명 */
-.top-header p{color:#6b7280;}
-/* 시스템 상태 박스 */
-.status-box{
-background:#e9f8ef;
-padding:14px 20px;
-border-radius:14px;
-font-weight:600;
-}
-/* 로고 */
-.logo{
-font-size:28px;
-font-weight:700;
-padding:15px;
-margin-bottom:20px;
-color:#111827 !important;
+--primary:#6366f1;
+--secondary:#8b5cf6;
+--accent:#06b6d4;
+
+```
+--bg:#f8fafc;
+--card:#ffffff;
+--text:#111827;
+--sub:#6b7280;
+
+--shadow:
+    0 10px 40px rgba(15,23,42,.08);
+
+--radius:24px;
+```
+
 }
 
-/* 카메라, 퀴즈 카드 */
-.camera-box,.quiz-card{
-background:white;
-border-radius:24px;
-padding:20px;
-box-shadow:0 8px 24px rgba(0,0,0,.06);
+/* 전체 배경 */
+html,
+body,
+.stApp,
+[data-testid="stAppViewContainer"]{
+background:var(--bg)!important;
+color:var(--text)!important;
 }
-/* 카메라 자리 표시 */
+
+/* 헤더 제거 */
+header[data-testid="stHeader"]{
+background:transparent!important;
+}
+
+/* =======================================================
+SIDEBAR
+======================================================= */
+
+[data-testid="stSidebar"]{
+background:#ffffff;
+border-right:1px solid #eef2f7;
+}
+
+.logo{
+text-align:center;
+font-size:30px;
+font-weight:800;
+margin-bottom:24px;
+
+```
+background:linear-gradient(
+    135deg,
+    var(--primary),
+    var(--secondary)
+);
+
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+```
+
+}
+
+/* =======================================================
+HERO HEADER
+======================================================= */
+
+.top-header{
+
+```
+background:
+    linear-gradient(
+        135deg,
+        #6366f1,
+        #8b5cf6
+    );
+
+color:white;
+
+padding:32px;
+
+border-radius:30px;
+
+box-shadow:
+    0 20px 50px rgba(99,102,241,.25);
+
+margin-bottom:24px;
+```
+
+}
+
+.top-header h1{
+color:white;
+margin:0;
+font-size:36px;
+}
+
+.top-header p{
+color:rgba(255,255,255,.85);
+margin-top:8px;
+}
+
+/* =======================================================
+CARD
+======================================================= */
+
+.camera-box,
+.quiz-card,
+.metric-card,
+div[data-testid="stContainer"]{
+
+```
+background:white;
+
+border-radius:24px;
+
+border:1px solid #eef2f7;
+
+box-shadow:var(--shadow);
+```
+
+}
+
+/* =======================================================
+CAMERA
+======================================================= */
+
+.camera-box{
+padding:20px;
+}
+
 .camera-placeholder{
-height:430px;
-border-radius:20px;
-background:linear-gradient(135deg,#e8ecff,#dbeafe);
+
+```
+height:480px;
+
+border-radius:22px;
+
+background:
+    linear-gradient(
+        135deg,
+        #eef2ff,
+        #dbeafe
+    );
+
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:28px;
+
+font-size:32px;
 font-weight:700;
+
 color:#4f46e5;
+```
+
 }
-/* 통계 카드 */
+
+/* =======================================================
+METRIC
+======================================================= */
+
 .metric-card{
-background:white;
-padding:18px;
-border-radius:18px;
+
+```
+padding:20px;
+
+min-height:120px;
+
 text-align:center;
-box-shadow:0 4px 15px rgba(0,0,0,.05);
-border:1px solid #ececec;
-margin-bottom:30px;
+
+transition:.25s;
+```
+
 }
-/* 카드 제목 */
-.metric-label{font-size:13px;color:#6b7280;}
-/* 카드 값 */
-.metric-value{font-size:28px;font-weight:700;}
-/* 섹션 제목 */
-.card-title,.section-title{
-font-size:24px;
-font-weight:700;
+
+.metric-card:hover{
+
+```
+transform:translateY(-4px);
+
+box-shadow:
+    0 20px 50px rgba(0,0,0,.08);
+```
+
+}
+
+.metric-label{
+
+```
+color:#6b7280;
+
+font-size:13px;
+```
+
+}
+
+.metric-value{
+
+```
+font-size:36px;
+
+font-weight:800;
+
+color:#111827;
+```
+
+}
+
+/* =======================================================
+TITLES
+======================================================= */
+
+.card-title,
+.section-title{
+
+```
+font-size:26px;
+
+font-weight:800;
+
+color:#111827;
+
 margin-bottom:12px;
+```
+
 }
-/* 데이터프레임 */
+
+/* =======================================================
+DATAFRAME
+======================================================= */
+
 div[data-testid="stDataFrame"]{
+
+```
 background:white;
-padding:10px;
+
 border-radius:20px;
-box-shadow:0 8px 24px rgba(0,0,0,.06);
+
+padding:10px;
+
+box-shadow:var(--shadow);
+```
+
 }
 
-/* 버튼 기본 */
-.stButton > button {
-    background:#262938 !important;
-    color:white !important;
-    border:none !important;
-    border-radius:12px !important;
-    font-weight:600 !important;
+/* =======================================================
+BUTTON
+======================================================= */
+
+.stButton > button,
+.stDownloadButton > button{
+
+```
+width:100%;
+
+border:none!important;
+
+border-radius:14px!important;
+
+padding:12px!important;
+
+font-weight:700!important;
+
+background:
+    linear-gradient(
+        135deg,
+        var(--primary),
+        var(--secondary)
+    )!important;
+
+color:white!important;
+
+transition:.25s;
+```
+
 }
 
-/* 마우스 올렸을 때 */
-.stButton > button:hover {
-    background:#4f46e5 !important;
-    color:white !important;
-    border:none !important;
+.stButton > button:hover,
+.stDownloadButton > button:hover{
+
+```
+transform:translateY(-2px);
+
+box-shadow:
+    0 10px 30px rgba(99,102,241,.35);
+```
+
 }
 
-/* 클릭 중 */
-.stButton > button:active {
-    background:#4338ca !important;
-    color:white !important;
+/* =======================================================
+MENU
+======================================================= */
+
+div[role="radiogroup"] label{
+
+```
+border-radius:14px!important;
+
+margin-bottom:8px!important;
+
+padding:14px!important;
+```
+
 }
 
-/* 다운로드 버튼 */
-.stDownloadButton > button {
-    background:#262938 !important;
-    color:white !important;
-    border:none !important;
-    border-radius:12px !important;
-    font-weight:600 !important;
+div[role="radiogroup"] label:hover{
+
+```
+background:#eef2ff!important;
+
+transform:translateX(4px);
+```
+
 }
 
-/* 다운로드 버튼 Hover */
-.stDownloadButton > button:hover {
-    background:#4f46e5 !important;
-    color:white !important;
-    border:none !important;
+div[role="radiogroup"] label[data-selected="true"]{
+
+```
+background:
+    linear-gradient(
+        90deg,
+        #6366f1,
+        #8b5cf6
+    )!important;
+```
+
 }
 
-/* 다운로드 버튼 클릭 */
-.stDownloadButton > button:active {
-    background:#4338ca !important;
-    color:white !important;
-}
-
-div[role="radiogroup"] label {
-    margin: 0 0 10px 0 !important;
-    padding: 14px !important;
-    border-radius: 12px !important;
-    width: 100% !important;
-    box-sizing: border-box;
-}
-
-div[role="radiogroup"] > label:hover {
-    background:#e5e7eb;
-}
-
-div[role="radiogroup"] > label[data-selected="true"] {
-    background:linear-gradient(90deg,#5865f2,#7c4dff);
-    color:white;
-}
-
-/* 사이드바 메뉴 글씨 */
-div[role="radiogroup"] label p {
-    color:#111827 !important;
-    font-weight:600 !important;
-    opacity:1 !important;
-}
-
-/* 선택된 메뉴 */
 div[role="radiogroup"] label[data-selected="true"] p{
-    color:white !important;
+color:white!important;
 }
 
-/* Hover */
-div[role="radiogroup"] > label:hover{
-    background:#dbeafe !important;
-    transform:translateX(4px);
-    transition:all .2s ease;
-}
+/* =======================================================
+PROGRESS
+======================================================= */
 
-.metric-card{
-    height:110px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-}
+.stProgress > div > div{
 
-div[data-testid="stContainer"]{
-    background:white;
-    border-radius:24px;
-    padding:20px;
+```
+background:
+    linear-gradient(
+        90deg,
+        #6366f1,
+        #8b5cf6
+    )!important;
+```
+
 }
