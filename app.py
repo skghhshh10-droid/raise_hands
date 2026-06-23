@@ -544,6 +544,52 @@ elif page == "📝 출석 체크":
                 hide_index=True
             )
 
+            # =====================
+            # 관리자 전용 출석 삭제
+            # =====================
+
+            if st.session_state.is_admin:
+
+                st.divider()
+
+                st.subheader(
+                    "🔒 관리자 전용 - 출석 기록 삭제"
+                )
+
+                delete_att = st.selectbox(
+                    "삭제할 출석 기록",
+                    attendance_df["student_id"]
+                    .astype(str)
+                    .tolist()
+                )
+
+                st.warning(
+                    "삭제된 출석 기록은 복구할 수 없습니다."
+                )
+
+                if st.button(
+                    "🗑 출석 삭제",
+                    width="stretch"
+                ):
+
+                    success = delete_attendance(
+                        delete_att
+                    )
+
+                    if success:
+
+                        st.success(
+                            "출석 기록 삭제 완료"
+                        )
+
+                        st.rerun()
+
+                    else:
+
+                        st.error(
+                            "출석 삭제 실패"
+                        )
+
         else:
 
             st.info(
