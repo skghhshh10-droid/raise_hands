@@ -68,11 +68,16 @@ def save_attendance(name):
             .execute()
         )
 
+        print("선택 이름:", name)
+        print("학생 조회 결과:", student_query.data)
+
         if len(student_query.data) == 0:
             print("학생이 등록되어 있지 않습니다.")
             return False
 
         student_id = student_query.data[0]["student_id"]
+
+        print("학번:", student_id)
 
         # 중복 출석 확인
         check = (
@@ -82,6 +87,8 @@ def save_attendance(name):
             .eq("student_id", student_id)
             .execute()
         )
+
+        print("기존 출석 데이터:", check.data)
 
         if len(check.data) > 0:
             print("이미 출석한 학생입니다.")
@@ -95,6 +102,8 @@ def save_attendance(name):
         supabase.table(
             "attendance"
         ).insert(data).execute()
+
+        print("출석 저장 성공")
 
         return True
 
