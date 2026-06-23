@@ -194,3 +194,28 @@ def delete_student(student_id):
     
         return False
     
+# =========================================================
+# 출석 삭제
+# =========================================================
+
+def delete_attendance(student_id):
+
+    try:
+
+        supabase.table(
+            "attendance"
+        ).delete().eq(
+            "student_id",
+            student_id
+        ).execute()
+
+        return True
+
+    except Exception as e:
+
+        print(
+            "DELETE ATTENDANCE ERROR :",
+            e
+        )
+
+        return False
