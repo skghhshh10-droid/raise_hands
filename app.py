@@ -14,7 +14,13 @@ from PIL import Image
 import numpy as np
 from yolo.detector import detect_hand_raise
 import cv2
-
+from database.attendance import (
+    get_students,
+    register_student,
+    save_attendance,
+    get_attendance,
+    delete_student
+)
 
 
 from database.attendance import (
