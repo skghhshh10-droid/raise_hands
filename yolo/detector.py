@@ -56,8 +56,6 @@ def detect_hand_raise(frame):
 
     results = model.track(
         frame,
-        persist=True,
-        verbose=False,
         conf=0.70
     )
 
