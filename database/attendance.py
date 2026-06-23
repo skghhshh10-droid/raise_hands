@@ -85,7 +85,27 @@ def save_attendance(name):
         if len(check.data) > 0:
             return False
 
-        ...
+        data = {
+            "student_id": student_id,
+            "status": "출석"
+        }
+
+        supabase.table(
+            "attendance"
+        ).insert(data).execute()
+
+        print("출석 저장 성공")
+
+        return True
+
+    except Exception as e:
+
+        print(
+            "ATTENDANCE ERROR :",
+            e
+        )
+
+        return False
 
 # =========================================================
 # 출석 조회
