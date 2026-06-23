@@ -216,6 +216,17 @@ box-shadow:0 4px 15px rgba(0,0,0,.05);
 """, unsafe_allow_html=True)
 
 # =========================================================
+# 관리자 인증
+# =========================================================
+
+ADMIN_ID = "admin"
+ADMIN_PW = "1234"
+
+if "is_admin" not in st.session_state:
+    st.session_state.is_admin = False
+
+
+# =========================================================
 # 사이드바
 # =========================================================
 
@@ -230,24 +241,101 @@ with st.sidebar:
     border-radius:20px;
     color:white;
     ">
-    <h3>🎓 관리자</h3>
-    <p>AI Smart Classroom</p>
+    <h3>🎓 AI Smart Classroom</h3>
+    <p>관리자 시스템</p>
     </div>
     """, unsafe_allow_html=True)
 
-   
+    # ------------------------
+    # 관리자 로그인
+    # ------------------------
 
-    page = st.radio(
-        "메뉴",
-        [
+    if not st.session_state.is_admin:
+
+        st.subheader("🔐 관리자 로그인")
+
+        admin_id = st.text_input(
+            "아이디"
+        )
+
+        admin_pw = st.text_input(
+            "비밀번호",
+            type="password"
+        )
+
+        if st.button(
+            "로그인",
+            width="stretch"
+        ):
+
+            if (
+                admin_id == ADMIN_ID
+                and admin_pw == ADMIN_PW
+            ):
+
+                st.session_state.is_admin = True
+
+                st.success(
+                    "관리자 로그인 성공"
+                )
+
+                st.rerun()
+
+            else:
+
+                st.error(
+                    "아이디 또는 비밀번호 오류"
+                )
+
+    else:
+
+        st.success(
+            "🔒 관리자 로그인 상태"
+        )
+
+        st.caption(
+            "관리자 전용 기능 사용 가능"
+        )
+
+        if st.button(
+            "로그아웃",
+            width="stretch"
+        ):
+
+            st.session_state.is_admin = False
+
+            st.rerun()
+
+    st.divider()
+
+    # ------------------------
+    # 메뉴
+    # ------------------------
+
+    if st.session_state.is_admin:
+
+        menu = [
             "📊 대시보드",
             "📝 출석 체크",
             "👨‍🎓 학생 관리",
             "➕ 학생 등록",
             "📈 참여도 분석"
-        ],
+        ]
+
+    else:
+
+        menu = [
+            "📊 대시보드",
+            "📝 출석 체크",
+            "📈 참여도 분석"
+        ]
+
+    page = st.radio(
+        "메뉴",
+        menu,
         label_visibility="collapsed"
     )
+
 
 
 
