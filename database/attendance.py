@@ -162,35 +162,35 @@ def get_students():
 # =========================================================
 
 def delete_student(student_id):
-"""학생 삭제"""
-
-```
-try:
-
-    # attendance 테이블 출석기록 삭제
-    supabase.table(
-        "attendance"
-    ).delete().eq(
-        "student_id",
-        student_id
-    ).execute()
-
-    # Students 테이블 학생 삭제
-    supabase.table(
-        "Students"
-    ).delete().eq(
-        "student_id",
-        student_id
-    ).execute()
-
-    return True
-
-except Exception as e:
-
-    print(
-        "DELETE ERROR :",
-        e
-    )
-
-    return False
-```
+    """학생 삭제"""
+    
+    
+    try:
+    
+        # attendance 테이블 출석기록 삭제
+        supabase.table(
+            "attendance"
+        ).delete().eq(
+            "student_id",
+            student_id
+        ).execute()
+    
+        # Students 테이블 학생 삭제
+        supabase.table(
+            "Students"
+        ).delete().eq(
+            "student_id",
+            student_id
+        ).execute()
+    
+        return True
+    
+    except Exception as e:
+    
+        print(
+            "DELETE ERROR :",
+            e
+        )
+    
+        return False
+    
