@@ -518,7 +518,7 @@ elif page == "📝 출석 체크":
 
                     st.balloons()
 
-                    st.rerun()
+                    #st.rerun()
 
                 else:
 
