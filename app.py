@@ -570,89 +570,89 @@ st.title("👨‍🎓 학생 관리")
 
 search = st.text_input(
     "🔍 학생 검색"
-)
+    )
 
 view_df = students_df.copy()
 
-if (
-    search
-    and len(students_df) > 0
-    and "name" in students_df.columns
-):
-
-    view_df = students_df[
-        students_df["name"]
-        .astype(str)
-        .str.contains(
-            search,
-            case=False
-        )
-    ]
-
-if len(view_df) > 0:
-
-    st.dataframe(
-        view_df,
-        width="stretch",
-        hide_index=True
-    )
-
-    st.caption(
-        f"총 {len(view_df)}명 조회"
-    )
-
-else:
-
-    st.info(
-        "검색 결과가 없습니다."
-    )
-
-st.divider()
-
-st.subheader("🗑 학생 삭제")
-
-students = get_students()
-
-if len(students) > 0:
-
-    delete_target = st.selectbox(
-        "삭제할 학생 선택",
-        [
-            f"{s['student_id']} - {s['name']}"
-            for s in students
-        ]
-    )
-
-    st.warning(
-        "삭제된 학생은 복구할 수 없습니다."
-    )
-
-    if st.button(
-        "🗑 학생 삭제",
-        width="stretch"
+    if (
+        search
+        and len(students_df) > 0
+        and "name" in students_df.columns
     ):
 
-        student_id = (
-            delete_target.split(" - ")[0]
+        view_df = students_df[
+            students_df["name"]
+            .astype(str)
+            .str.contains(
+                search,
+                case=False
+            )
+        ]
+
+    if len(view_df) > 0:
+
+        st.dataframe(
+            view_df,
+            width="stretch",
+            hide_index=True
         )
 
-        success = delete_student(
-            student_id
+        st.caption(
+            f"총 {len(view_df)}명 조회"
         )
 
-        if success:
+    else:
 
-            st.success(
-                "학생 삭제 완료"
+        st.info(
+            "검색 결과가 없습니다."
+        )
+
+    st.divider()
+
+    st.subheader("🗑 학생 삭제")
+
+    students = get_students()
+
+    if len(students) > 0:
+
+        delete_target = st.selectbox(
+            "삭제할 학생 선택",
+            [
+                f"{s['student_id']} - {s['name']}"
+                for s in students
+            ]
+        )
+
+        st.warning(
+            "삭제된 학생은 복구할 수 없습니다."
+        )
+
+        if st.button(
+            "🗑 학생 삭제",
+            width="stretch"
+        ):
+
+            student_id = (
+                delete_target.split(" - ")[0]
             )
 
-            st.rerun()
-
-        else:
-
-            st.error(
-                "학생 삭제 실패"
+            success = delete_student(
+                student_id
             )
+
+            if success:
+
+                st.success(
+                    "학생 삭제 완료"
+                )
+
+                st.rerun()
+
+            else:
+
+                st.error(
+                    "학생 삭제 실패"
+                )
 
 
 
