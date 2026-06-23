@@ -557,7 +557,7 @@ elif page == "📝 출석 체크":
 
 elif page == "👨‍🎓 학생 관리":
 
-```
+
 if not st.session_state.is_admin:
 
     st.error(
@@ -653,7 +653,7 @@ if len(students) > 0:
             st.error(
                 "학생 삭제 실패"
             )
-```
+
 
 
 
@@ -663,7 +663,6 @@ if len(students) > 0:
 
 elif page == "➕ 학생 등록":
 
-```
 if not st.session_state.is_admin:
 
     st.error(
@@ -750,7 +749,7 @@ else:
     st.info(
         "아직 등록된 학생이 없습니다."
     )
-```
+
 
 
 # =========================================================
