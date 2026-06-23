@@ -505,7 +505,7 @@ elif page == "📝 출석 체크":
             )
 
             if detected:
-
+                st.write("선택 학생:", student_name)
                 success = save_attendance(
                     student_name
                 )
